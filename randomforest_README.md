@@ -198,28 +198,29 @@ dam_3 <- data.use.pi[data.use.pi$피해자신체상해정도=="부상",]
 
 ### oversample ("부상"카테고리의 수만큼 oversample) 및 일정한 표본을 뽑기위해 set.seed로 설정(822)
 
-+ 코드를 재실행시 결과들이 동일하게 나올수 있도록 set.seed() 설정 
-+ 범주들 중 가장 많은 갯수가 속해있는 "부상"카테고리 수인 45066개로 dplyr패키지의 sample_n 함수를 통해 oversampling 
-+ replace = TRUE는 사망과 상해없음에 속해있는 데이터셋의 수가 45066개 보다 적기 때문에 복원추출을 하기 위해 추가
-
-```c
-
-```
-### oversampling한 데이터 병합시키기
+> + 코드를 재실행시 결과들이 동일하게 나올수 있도록 set.seed() 설정 
+> + 범주들 중 가장 많은 갯수가 속해있는 "부상"카테고리 수인 45066개로 dplyr패키지의 sample_n 함수를 통해 oversampling 
+> + replace = TRUE는 사망과 상해없음에 속해있는 데이터셋의 수가 45066개 보다 적기 때문에 복원추출을 하기 위해 추가
 
 + 일정한 샘플을 뽑기위해 set.seed() 설정
 
 ```c
 set.seed(822)
 ```
-
 + oversampling한 데이터들을 rbind 함수를 통해 병합.
 ```c
 dam_sam1 <- sample_n(dam_1 , 45066, replace = T) # 사망인 데이터 oversampling
 dam_sam2 <- sample_n(dam_2 , 45066, replace = T) # 상해없음인 데이터 oversampling
 dam_sam3 <- sample_n(dam_3 , 45066, replace = T) # 부상인 데이터 oversampling
-
 ```
+### oversampling한 데이터 병합시키기
+```c
+data.use.pi.bind <- rbind(dam_sam1, dam_sam2, dam_sam3)
+```
+
+
+
+
 ##### randomforest분석을 할 때마다 임의로 train/ test셋이 분리되기 때문에 별도의 train / test셋은 필요하지 않습니다.
 ------------------------------
 ---------------------------------------------
@@ -279,20 +280,3 @@ ggplot(imp, aes(x=reorder(varnames, MeanDecreaseAccuracy), weight=MeanDecreaseAc
 --------------------
 --------------------------------------
 --------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
