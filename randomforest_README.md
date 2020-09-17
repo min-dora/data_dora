@@ -88,7 +88,7 @@ dam_1 <- data.use.ga[data.use.ga$가해자신체상해정도=="사망",]
 dam_2 <- data.use.ga[data.use.ga$가해자신체상해정도=="상해없음",]
 dam_3 <- data.use.ga[data.use.ga$가해자신체상해정도=="부상",]
 ```
-### oversample ("부상"카테고리의 수만큼 oversample) 및 일정한 표본을 뽑기위해 set.seed로 설정(822)
+### oversample ("부상"카테고리의 수만큼 oversample) 및 일정한 표본을 뽑기위해 set.seed로 설정
 + 코드를 재실행시 결과들이 동일하게 나올수 있도록 set.seed를 사용하여 일정한 값을 주기
 ```c
 set.seed(822)
@@ -122,7 +122,7 @@ data.use.ga.bind <- rbind(dam_sam1, dam_sam2, dam_sam3)
 > + 설명변수 = 요일, 가해자법규위반, 노면상태, 기상상태, 가해자보호장구, 피해당사자종별, 피해자신체상해정도, 피해자보호장구 
 
 > + 세부옵션 = ntree( 몇개의 나무를 생성할지 정하는 옵션 ) => 의사결정나무의 갯수를 300개 
-	importance ( 변수의 상대적 중요도를 보기위한 옵션)  => importance = T로 설정
+> + importance ( 변수의 상대적 중요도를 보기위한 옵션)  => importance = T로 설정
 ```c
 fitRF_ga <- 
   randomForest(가해자신체상해정도~요일+가해자법규위반+노면상태+기상상태+가해자보호장구+
@@ -173,7 +173,7 @@ ggplot(imp, aes(x=reorder(varnames, MeanDecreaseAccuracy), weight=MeanDecreaseAc
 data.use.pi <- filter(data.use, data.use$피해당사자종별 == "이륜차")
 ```
 ### 피해자신체상해정도(결과변수)가 "없음"인 경우 제거 
-+ 피해자신체상해정도 == "없음"인 데이터 제거 => 가해자가 혼자 사고 낸 경우(구조물에 충돌) 피해자가 없음, 그리하여 피해자의 상해정도가 없기에 분석에서 제거
++ 피해자신체상해정도 == "없음"인 데이터 제거 => 가해자가 혼자 사고 낸 경우에는 피해자가 없음, 그리하여 피해자의 상해정도가 "없음"으므로 분석에서 제거
 ```c
 data.use.pi <- filter(data.use.pi, data.use.pi$피해자신체상해정도 != "없음")
 ```
@@ -196,7 +196,7 @@ dam_2 <- data.use.pi[data.use.pi$피해자신체상해정도=="상해없음",]
 dam_3 <- data.use.pi[data.use.pi$피해자신체상해정도=="부상",]
 ```
 
-### oversample ("부상"카테고리의 수만큼 oversample) 및 일정한 표본을 뽑기위해 set.seed로 설정(822)
+### oversample ("부상"카테고리의 수만큼 oversample) 및 일정한 표본을 뽑기위해 set.seed로 설정
 
 > + 코드를 재실행시 결과들이 동일하게 나올수 있도록 set.seed() 설정 
 > + 범주들 중 가장 많은 갯수가 속해있는 "부상"카테고리 수인 45066개로 dplyr패키지의 sample_n 함수를 통해 oversampling 
@@ -238,7 +238,7 @@ data.use.pi.bind <- rbind(dam_sam1, dam_sam2, dam_sam3)
 > + 설명변수 = 요일, 가해자법규위반, 노면상태, 기상상태, 가해자보호장구, 피해당사자종별, 가해자신체상해정도, 피해자보호장구 
 
 > + 세부옵션 = ntree( 몇개의 나무를 생성할지 정하는 옵션 ) => 의사결정나무의 갯수를 300개 
-	importance ( 변수의 상대적 중요도를 보기위한 옵션)  => importance = T로 설정
+> + importance ( 변수의 상대적 중요도를 보기위한 옵션)  => importance = T로 설정
 
 ```c
 fitRF_pi <- 
@@ -255,7 +255,7 @@ fitRF_pi
 > + varImpPlot()를 통해 변수중요도 그래프를 지정 by. randomForest 패키지
 > + as.data.frame()로 데이터프레임으로 변경
 > + rownames을 varnames라는 변수 생성, rownames을 제거
-> + 강조하고 싶은 "가해자보호장구" 에 해당하는 위치에만 2, 나머지는 1이라는 값 추가
+> + 강조하고 싶은 "피해자보호장구" 에 해당하는 위치에만 2, 나머지는 1이라는 값 추가
 
 ```c
 imp <- varImpPlot(fitRF_pi)
