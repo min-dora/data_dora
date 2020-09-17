@@ -178,27 +178,37 @@ data.use.pi <- filter(data.use, data.use$피해당사자종별 == "이륜차")
 data.use.pi <- filter(data.use.pi, data.use.pi$피해자신체상해정도 != "없음")
 ```
 ### 결과변수의 타입을 character로 바꾼 후 factor로 변환
+
 + 제거하고 난 후 factor의 다시 as.charactor후 as.factor하여 factor의 level을 줄여줍니다. 
+
 ```c
 data.use.pi$피해자신체상해정도 <- data.use.pi$피해자신체상해정도 %>% as.character()
 data.use.pi$피해자신체상해정도 <- data.use.pi$피해자신체상해정도 %>% as.factor()
 ```
+
 ### 결과변수 각 카테고리별 데이터 셋 분리
+
 + 각 항목별 건수를 비슷하게 맞춰주기 위해서 먼저 사망, 부상, 상해없음 별로 데이터를 인덱싱을 통해 분리하였습니다.
+
 ```c
 dam_1 <- data.use.pi[data.use.pi$피해자신체상해정도=="사망",]
 dam_2 <- data.use.pi[data.use.pi$피해자신체상해정도=="상해없음",]
 dam_3 <- data.use.pi[data.use.pi$피해자신체상해정도=="부상",]
 ```
+
 ### oversample ("부상"카테고리의 수만큼 oversample) 및 일정한 표본을 뽑기위해 set.seed로 설정(822)
+
 + 코드를 재실행시 결과들이 동일하게 나올수 있도록 set.seed() 설정 
 + 범주들 중 가장 많은 갯수가 속해있는 "부상"카테고리 수인 45066개로 dplyr패키지의 sample_n 함수를 통해 oversampling 
 + replace = TRUE는 사망과 상해없음에 속해있는 데이터셋의 수가 45066개 보다 적기 때문에 복원추출을 하기 위해 추가
+
 ```c
 
 ```
 ### oversampling한 데이터 병합시키기
+
 + 일정한 샘플을 뽑기위해 set.seed() 설정
+
 ```c
 set.seed(822)
 ```
@@ -229,18 +239,47 @@ dam_sam3 <- sample_n(dam_3 , 45066, replace = T) # 부상인 데이터 oversampl
 > + 세부옵션 = ntree( 몇개의 나무를 생성할지 정하는 옵션 ) => 의사결정나무의 갯수를 300개 
 	importance ( 변수의 상대적 중요도를 보기위한 옵션)  => importance = T로 설정
 
+```c
+fitRF_pi <- 
+  randomForest(피해자신체상해정도~요일+가해자법규위반+노면상태+기상상태+가해당사자종별+가해자보호장구
+                          +가해자신체상해정도+피해자보호장구, data = data.use.pi.bind, importance = TRUE, ntree = 300)
+
+fitRF_pi
+```
+
+
 
 ### 피해자 그래프 그리기 설정
-	randomForest패키지의 varImpPlot 함수를 통해 변수중요도 그래프를 지정한 뒤, as.data.frame 함수로 데이터프레임화 한 후, rownames을 varnames라는 변수를 추가 만들고 rownames을 제거합니다.
-	그 중에 강조하고 싶은 "가해자보호장구" 에 해당하는 위치에만 2라는 값을 넣어주고, 나머지는 1을 넣어주었습니다.
+
+> + varImpPlot()를 통해 변수중요도 그래프를 지정 by. randomForest 패키지
+> + as.data.frame()로 데이터프레임으로 변경
+> + rownames을 varnames라는 변수 생성, rownames을 제거
+> + 강조하고 싶은 "가해자보호장구" 에 해당하는 위치에만 2, 나머지는 1이라는 값 추가
+
+```c
+imp <- varImpPlot(fitRF_pi)
+imp <- as.data.frame(imp)
+imp$varnames <- rownames(imp) # row names to column
+rownames(imp) <- NULL  
+imp$var_categ <- c(1,1,1,1,1,1,1,2)
+```
 
 ### 피해자 그래프 실행하기
-	그 후 ggplot2패키지에서 ggplot 함수를 이용해 변수중요도 그래프를 그려주었습니다.
+```c
+ggplot(imp, aes(x=reorder(varnames, MeanDecreaseAccuracy), weight=MeanDecreaseAccuracy)) +
+  geom_bar()+
+  geom_bar(data = subset(imp, var_categ=="2"), fill = "#ff0000")+
+  scale_fill_discrete(name="Variable Group") +
+  ylab("MeanDecreaseAccuracy")+
+  xlab("")+
+  coord_flip()+
+  theme(axis.text.y = element_text(size = 20, face = "bold"))
+```
 
-######## 가해자 randomforest 분석
+--------------------
 --------------------------------------
 --------------------------------------
---------------------------------------
+
 
 
 
