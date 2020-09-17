@@ -111,13 +111,13 @@ data.use.ga.bind <- rbind(dam_sam1, dam_sam2, dam_sam3)
 ## #가해자 randomforest 분석
 
 ### randomforest를 이용한 가해자모델만들기
-+ randomforest를 실행할 경우 임의로 train/test으로 나뉘며 train으로 모델을 만들기 때문에 set.seed함수를 통해
+> + randomforest를 실행할 경우 임의로 train/test으로 나뉘며 train으로 모델을 만들기 때문에 set.seed함수를 통해
 재실행 후에도 동일한 결과를 나타나게 합니다.
  
-+ 목표변수 = "가해자신체상해정도" 
-+ 설명변수 = 요일, 가해자법규위반, 노면상태, 기상상태, 가해자보호장구, 피해당사자종별, 피해자신체상해정도, 피해자보호장구 
+> + 목표변수 = "가해자신체상해정도" 
+> + 설명변수 = 요일, 가해자법규위반, 노면상태, 기상상태, 가해자보호장구, 피해당사자종별, 피해자신체상해정도, 피해자보호장구 
 
-+ 세부옵션 = ntree( 몇개의 나무를 생성할지 정하는 옵션 ) => 의사결정나무의 갯수를 300개 
+> + 세부옵션 = ntree( 몇개의 나무를 생성할지 정하는 옵션 ) => 의사결정나무의 갯수를 300개 
 	importance ( 변수의 상대적 중요도를 보기위한 옵션)  => importance = T로 설정
 ```c
 fitRF_ga <- 
@@ -156,9 +156,53 @@ ggplot(imp, aes(x=reorder(varnames, MeanDecreaseAccuracy), weight=MeanDecreaseAc
 
 ---------------------------------------
 
+## #피해자 데이터 전처리
 
+### 피해자당사자종별이 "이륜차"인 데이터 뽑기
++ filter함수를 통해 가해당사자종별이 이륜차인 데이터를 분리했습니다.
+```c
+data.use.pi <- filter(data.use, data.use$피해당사자종별 == "이륜차")
+```
+### 피해자신체상해정도(결과변수)가 "없음"인 경우 제거 
++ 피해자신체상해정도가 없음인 경우를 제거하는 이유는 가해자가 혼자 사고 낸 경우(구조물에 충돌) 피해자가 없음, 그리하여 피해자의 상해정도가 없기에 분석에서 제거
+```c
+data.use.pi <- filter(data.use.pi, data.use.pi$피해자신체상해정도 != "없음")
+```
+### 결과변수의 타입을 character로 바꾼 후 factor로 변환
++ 제거하고 난 후 factor의 다시 as.charactor후 as.factor하여 factor의 level을 줄여줍니다. 
+```c
+data.use.pi$피해자신체상해정도 <- data.use.pi$피해자신체상해정도 %>% as.character()
+data.use.pi$피해자신체상해정도 <- data.use.pi$피해자신체상해정도 %>% as.factor()
+```
+### 결과변수 각 카테고리별 데이터 셋 분리
++ 각 항목별 건수를 비슷하게 맞춰주기 위해서 먼저 사망, 부상, 상해없음 별로 데이터를 인덱싱을 통해 분리하였습니다.
+```c
+dam_1 <- data.use.pi[data.use.pi$피해자신체상해정도=="사망",]
+dam_2 <- data.use.pi[data.use.pi$피해자신체상해정도=="상해없음",]
+dam_3 <- data.use.pi[data.use.pi$피해자신체상해정도=="부상",]
+```
+### oversample ("부상"카테고리의 수만큼 oversample) 및 일정한 표본을 뽑기위해 set.seed로 설정(822)
++ 코드를 재실행시 결과들이 동일하게 나올수 있도록 set.seed() 설정 
++ 범주들 중 가장 많은 갯수가 속해있는 "부상"카테고리 수인 45066개로 dplyr패키지의 sample_n 함수를 통해 oversampling 
++ replace = TRUE는 사망과 상해없음에 속해있는 데이터셋의 수가 45066개 보다 적기 때문에 복원추출을 하기 위해 추가
+```c
 
+```
+### oversampling한 데이터 병합시키기
++ 일정한 샘플을 뽑기위해 set.seed() 설정
+```c
+set.seed(822)
+```
 
++ oversampling한 데이터들을 rbind 함수를 통해 병합.
+```c
+dam_sam1 <- sample_n(dam_1 , 45066, replace = T) # 사망인 데이터 oversampling
+dam_sam2 <- sample_n(dam_2 , 45066, replace = T) # 상해없음인 데이터 oversampling
+dam_sam3 <- sample_n(dam_3 , 45066, replace = T) # 부상인 데이터 oversampling
+
+```
+##### randomforest분석을 할 때마다 임의로 train/ test셋이 분리되기 때문에 별도의 train / test셋은 필요하지 않습니다.
+------------------------------
 
 
 
