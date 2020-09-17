@@ -23,6 +23,7 @@ library(randomForest)
 library(ggplot2)
 ```
 
+기초 전처리
 
 ### 원본데이터 불러오기
 + 코드를 실행하여 첨부한 원본데이터 (가해자차종 또는 피해자차종이 이륜차인 교통사고 정보(2015~2019년).csv)를 불러옵니다.
@@ -46,6 +47,73 @@ data.use$가해자신체상해정도 %>% table()
 data.use$피해자신체상해정도 <- ifelse(data.use$피해자신체상해정도=="중상"|data.use$피해자신체상해정도=="경상"|data.use$피해자신체상해정도=="부상신고", "부상", data.use$피해자신체상해정도)
 data.use$피해자신체상해정도 %>% table()
 ```
+
+### 신체상해정도가 "기타불명"인 경우를 제외
++ 신체상해정도가 "기타불명"인 경우 어느정도 다쳤는지 알 수 없기 때문에 filter함수를 통해 분석에서 제거합니다.
+```c
+data.use <- filter(data.use, data.use$가해자신체상해정도!="기타불명"&data.use$피해자신체상해정도!="기타불명")
+```
+### 변수들을 factor로 바꿔주기
++	결과변수와 설명변수들을 모두 as.factor를 통해 변수타입을 factor로 바꾸어 주었습니다.
+```c
+data.use$요일 <- data.use$요일 %>% as.factor()
+data.use$가해자법규위반 <- data.use$가해자법규위반 %>% as.factor()
+data.use$노면상태 <- data.use$노면상태 %>% as.factor()
+data.use$기상상태 <- data.use$기상상태 %>% as.factor()
+data.use$가해당사자종별 <- data.use$가해당사자종별 %>% as.factor()
+data.use$가해자신체상해정도 <- data.use$가해자신체상해정도 %>% as.factor()
+data.use$가해자보호장구 <- data.use$가해자보호장구 %>% as.factor()
+data.use$피해당사자종별 <- data.use$피해당사자종별 %>% as.factor()
+data.use$피해자신체상해정도 <- data.use$피해자신체상해정도 %>% as.factor()
+data.use$피해자보호장구 <- data.use$피해자보호장구 %>% as.factor()
+```
+
+-----------------------------------------------
+-----------------------------------------------
+
+## 가해자 데이터 전처리
+
+### 가해자당사자종별이 "이륜차"인 데이터 뽑기
++ filter함수를 통해 가해당사자종별이 이륜차인 데이터를 분리했습니다.
+```c
+data.use.ga <- filter(data.use, data.use$가해당사자종별 == "이륜차")
+```
+
+### 결과변수 각 카테고리별 데이터 셋 분리
++ 각 항목별 건수를 비슷하게 맞춰주기 위해서 먼저 사망, 부상, 상해없음 별로 데이터를 인덱싱을 통해 분리하였습니다.
+```c
+dam_1 <- data.use.ga[data.use.ga$가해자신체상해정도=="사망",]
+dam_2 <- data.use.ga[data.use.ga$가해자신체상해정도=="상해없음",]
+dam_3 <- data.use.ga[data.use.ga$가해자신체상해정도=="부상",]
+```
+### oversample ("부상"카테고리의 수만큼 oversample) 및 일정한 표본을 뽑기위해 set.seed로 설정(822)
++ 코드를 재실행시 결과들이 동일하게 나올수 있도록 set.seed를 사용하여 일정한 값을 주기
+```c
+set.seed(822)
+```
++ 범주들 중 가장 많은 갯수가 속해있는 "부상"카테고리 수인 45066개로 dplyr패키지의 sample_n 함수를 통해 oversampling하였습니다.
++ replace를 TRUE로 바꾼이유는, 사망과 상해없음에 속해있는 데이터셋의 수가 45066개 보다 적기 때문에 복원추출을 하는 옵션을 넣었습니다.
+```c
+dam_sam1 <- sample_n(dam_1 , 45066, replace = T) # 사망인 데이터 oversampling
+dam_sam2 <- sample_n(dam_2 , 45066, replace = T) # 상해없음인 데이터 oversampling
+dam_sam3 <- sample_n(dam_3 , 45066, replace = T) # 상해없음인 데이터 oversampling
+```
+### oversampling한 데이터 병합시키기
++ 위에 코드에서 oversampling한 데이터들을 rbind 함수를 통해 병합시켜줍니다.
+```c
+data.use.ga.bind <- rbind(dam_sam1, dam_sam2, dam_sam3)
+```
+
+###### randomforest분석을 할 때마다 임의로 train/ test셋이 분리되기 때문에 별도의 train / test셋은 필요하지 않습니다.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
 
 
 
