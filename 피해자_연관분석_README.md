@@ -1,4 +1,4 @@
-# randomforest_README
+# 피해자_연관분석_README
 
 ## #기초환경설치
 ### package설치 (caret, dplyr, randomForest, ggplot2)
