@@ -23,7 +23,7 @@ library(randomForest)
 library(ggplot2)
 ```
 
-기초 전처리
+## 기초 전처리
 
 ### 원본데이터 불러오기
 + 코드를 실행하여 첨부한 원본데이터 (가해자차종 또는 피해자차종이 이륜차인 교통사고 정보(2015~2019년).csv)를 불러옵니다.
@@ -69,7 +69,6 @@ data.use$피해자보호장구 <- data.use$피해자보호장구 %>% as.factor()
 ```
 
 -----------------------------------------------
------------------------------------------------
 
 ## 가해자 데이터 전처리
 
@@ -96,7 +95,7 @@ set.seed(822)
 ```c
 dam_sam1 <- sample_n(dam_1 , 45066, replace = T) # 사망인 데이터 oversampling
 dam_sam2 <- sample_n(dam_2 , 45066, replace = T) # 상해없음인 데이터 oversampling
-dam_sam3 <- sample_n(dam_3 , 45066, replace = T) # 상해없음인 데이터 oversampling
+dam_sam3 <- sample_n(dam_3 , 45066, replace = T) # 부상인 데이터 oversampling
 ```
 ### oversampling한 데이터 병합시키기
 + 위에 코드에서 oversampling한 데이터들을 rbind 함수를 통해 병합시켜줍니다.
@@ -109,6 +108,29 @@ data.use.ga.bind <- rbind(dam_sam1, dam_sam2, dam_sam3)
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
+## 가해자 randomforest 분석
+
+### randomforest를 이용한 가해자모델만들기
++ randomforest를 실행할 경우 임의로 train/test으로 나뉘며 train으로 모델을 만들기 때문에 set.seed함수를 통해
+재실행 후에도 동일한 결과를 나타나게 합니다.
+ 
++ 목표변수 = "가해자신체상해정도" 
+설명변수 = 요일, 가해자법규위반, 노면상태, 기상상태, 가해자보호장구, 피해당사자종별, 피해자신체상해정도, 피해자보호장구 
+
++ 세부옵션 = ntree( 몇개의 나무를 생성할지 정하는 옵션 ) => 의사결정나무의 갯수를 300개 
+importance ( 변수의 상대적 중요도를 보기위한 옵션)  => importance = T로 설정
+
+
+여기서 나오는 oob error는 모델을 만드는 train이 아닌 모델에 쓰이지 않는 test을 통해 평가한 오차로써 oob error는 26.14%이며,
+acuuracy(정분류율)은 "1-oob error" 로써, accuracy는 0.7386입니다. 
+
+
+### 가해자 그래프 그리기 설정
+	randomForest패키지의 varImpPlot 함수를 통해 변수중요도 그래프를 지정한 뒤, as.data.frame 함수로 데이터프레임화 한 후, rownames을 varnames라는 변수를 추가 만들고 rownames을 제거합니다.
+	그 중에 강조하고 싶은 "가해자보호장구" 에 해당하는 위치에만 2라는 값을 넣어주고, 나머지는 1을 넣어주었습니다.
+### 가해자 그래프 실행하기
+	그 후 ggplot2패키지에서 ggplot 함수를 이용해 변수중요도 그래프를 그려주었습니다.
+######## 가해자 randomforest 분석 -끝-########
 
 
 
