@@ -1,6 +1,7 @@
 # #상품군_README
+## ## encoding by. utf-8
 
-## #기초환경설치
+## # 기초환경설치
 
 ### package설치(dplyr, reshape2, ggplot2, scales)
 
@@ -42,7 +43,7 @@ data.use <- read.csv(choose.files(),)
 data.use %>% head()
 ```
 
-# #분기 별 온라인 쇼핑 합계액
+# # 분기 별 온라인 쇼핑 합계액
 
 ## 데이터 전처리
 
@@ -78,7 +79,7 @@ ggp
 
 
 
-# #분기 별 온라인쇼핑 상품군 거래액
+# # 분기 별 온라인쇼핑 상품군 거래액
 
 ## 데이터 전처리
 
