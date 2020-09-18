@@ -69,9 +69,9 @@ names(data.use.1) <- c("분기","(억)원")
 + 그래프의 레이블 글씨 크기는 30 축제목은 25와 글씨굵기를 진하게 지정하고 x축의 레이블 각도를 45도로 지정
 
 ```c
-ggp <- ggplot(data=data.use.1,aes(x=분기,y=`(억)원`,group=1)) +   :  
-  geom_line(size=2,color="skyblue")+ 				: 
-  scale_y_continuous(labels=comma) +				:  
+ggp <- ggplot(data=data.use.1,aes(x=분기,y=`(억)원`,group=1)) +
+  geom_line(size=2,color="skyblue")+
+  scale_y_continuous(labels=comma) +
   theme(axis.text=element_text(size=30),axis.title=element_text(size=25,face="bold"),axis.text.x=element_text(angle=45,hjust=1)) 
   
 ggp 	
