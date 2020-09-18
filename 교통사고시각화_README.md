@@ -1,6 +1,7 @@
 # # 교통사고시각화_README
+## ## encoding by. CP949
 
-## #기초환경설치
+## # 기초환경설치
 ### package설치 (dplyr, reshape2, ggplot2, scales)
 
 ```c 
