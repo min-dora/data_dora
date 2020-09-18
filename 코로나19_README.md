@@ -71,6 +71,7 @@ data.use$날짜 <- data.use$날짜 %>% as.Date()
 + data.use를 이용해 x축은 `날짜` y축은 `누적확진자수`로 되어있는 1개의 꺽은선 그래프를 그리기.
 + 꺽은선의 크기는 2, 색은 다크블루로 지정, 그리고 축제목을 x축은 `날짜` y축은 `확진자수`로 지정
 + x축의 레이블 범위를 2020-01-19에서 2020-09-06에서 매월 19일로 지정
++ y축의 레이블에 콤마를 찍어준다. 
 + x축 레이블 크기를 25, 각도를 30도로 지정, 축제목 글씨포인트를 25로 하고 굵기를 진하게 지정 
 + y축 레이블 크기를 25, 축제목 글씨포인트를 25로 하고 굵기를 진하게 지정
 
@@ -78,7 +79,7 @@ data.use$날짜 <- data.use$날짜 %>% as.Date()
 ggp <- ggplot(data=data.use,aes(x=날짜,y=누적확진자수,group=1)) +
   geom_line(size=2,color="darkblue") + labs(x="날짜", y="확진자수") +
   scale_x_date(breaks=seq(as.Date("2020-01-19"),as.Date("2020-09-06"),by="1 month")) +
-  scale_y_continuous(labels=comma) +							 : y축의 레이블에 콤마를 찍어준다. 
+  scale_y_continuous(labels=comma) +
   theme(axis.text.x=element_text(size=25,angle=30,hjust=1),axis.title=element_text(size=25,face="bold")) +
   theme(axis.text.y=element_text(size=25),axis.title=element_text(size=25,face="bold"))
 
