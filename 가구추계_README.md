@@ -43,9 +43,9 @@ data <- read.csv(choose.files(),)
 data %>% head()
 ```
 ## 데이터 전처리
-
++ data의 `시점`,`X1인`,`X4인`열을 선택하여 data.use에 저장
 ```c
-data.use <- data %>% select(시점,X1인,X4인)	:  data의 `시점`,`X1인`,`X4인`열을 선택하여 data.use에 저장
+data.use <- data %>% select(시점,X1인,X4인)
 ```
 
 ### 변수 가공 및 소수점 제거
