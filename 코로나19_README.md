@@ -1,6 +1,7 @@
 # # 코로나19_README
+## ## encoding by. utf-8
 
-## #기초환경설치
+## # 기초환경설치
 ### package설치 (dplyr, reshape2, ggplot2, scales)
 
 ```c 
