@@ -1,6 +1,11 @@
 # 2020_1116 제주도 기상정보 분석
 rm(list = ls())
 
+# library
+library(dplyr)
+library(ggplot2)
+library(plotly)
+
 # 데이터 : 제주특별자치도개발공사_기상 정보_20191231.csv
 data.raw <- read.csv(file.choose())
 data.raw %>% head()
@@ -20,17 +25,24 @@ data.raw
 data.tempdist <- mutate(data.raw, temp_dist = 최대기온-최소기온)
 data.tempdist %>% head()
 
-data.tempdist %>% arrange(desc(temp_dist))
+arrange(data.tempdist, desc(temp_dist))
 
 ggplot(data = data.tempdist)+geom_line(aes(x = 일자, y = temp_dist), group = 1)
 
-data.month <- data.tempdist %>% mutate(월 = substr(data.tempdist$일자, 6,7))
+data.month <- mutate(data.tempdist, 월 = substr(data.tempdist$일자, 6,7))
 
 # 월별 평균 일교차
-data.avg.td <- data.month %>% group_by(월) %>% summarise(avg = mean(temp_dist))
 
-data.avg.td <- data.month %>% group_by(월) %>% mutate(temp_dist_avg = mean(temp_dist))
+data.gr <- group_by(data.month, 월)
 
+summarise(data.gr, avg = mean(temp_dist))
+
+data.avg.td <- mutate(data.gr, temp_dist_avg = mean(temp_dist))
+##
+```c
+ # 20201120 여기까지 수정
+```
+##
 # 봄, 가을에 일교차가 큰 것을 볼 수 있음.
 gp <- ggplot(data = data.avg.td)+geom_line(aes(x = 월, y = temp_dist_avg), group = 1, size = 2)+geom_point(aes(x = 월, y = temp_dist_avg), size = 3, colour = "red")
 ggplotly(gp)
