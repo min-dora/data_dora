@@ -30,13 +30,23 @@ fn_lon_lat_box <- function(lon, lat, dist = 1){
 }
 # 대전시청 좌표
 # 36.339903, 127.394984
-boxlocation <- fn_lon_lat_box(127.394984, 36.339903, 5)
+# boxlocation <- fn_lon_lat_box(127.394984, 36.339903, 6)
+# djmap <- get_map(boxlocation)
 
-djmap <- get_map(boxlocation)
+# 구글키 삽입 (github 업로드로 인해 #처리, 실제로는 본인 키 넣음)
+register_google(key='#############################')
 
+# 중심좌표 (google api키 사용)
+boxlocation <- c(127.378953, 36.321655)
+djmap <- get_map(boxlocation, maptype="roadmap",source="google",zoom=12)
+djmap
+
+# 지도 확인
 ggmap(djmap)
 
+# 지도에 점 추가
+gp <- ggmap(djmap)+geom_point(data = data.gr, aes(x = 경도, y = 위도,fill = 발생지시군구), size = 3, alpha = 0.5)
 
-
-
+# 대화형 지도
+ggplotly(gp)
 
