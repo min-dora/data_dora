@@ -59,7 +59,7 @@ ggplotly(gp)
 
 # add hexgon
 gm <- ggmap(djmap)+coord_cartesian()+
-  geom_hex(aes(x = 경도, y = 위도), bins = 18, alpha = 0.5, data = data.gr)
+  geom_hex(aes(x = 경도, y = 위도), bins = 10, alpha = 0.5, data = data.gr)
 
 gm <- gm+scale_fill_gradientn(colours = colorRampPalette(c("white", "darkred"))(5))
 
@@ -75,5 +75,49 @@ gm_hex %>% ggplotly()
 
 # 서구 가해자 피해자 교차테이블
 data.west <- data.gr %>% filter(발생지시군구=='서구')
-table(data.west$가해자_당사자종별, data.west$피해자_당사자종별)ㄴ
+
+table(data.west$가해자_당사자종별, data.west$피해자_당사자종별)
 table(data.gr$가해자_당사자종별, data.gr$피해자_당사자종별)
+
+data.gr$가해자_당사자종별 %>% table
+data.gr$피해자_당사자종별 %>% table
+
+ggplot(data = data.gr)+geom_bar(aes(x = 발생지시군구, y = '', fill = 가해자_당사자종별), stat = "identity")
+
+?geom_bar
+
+data.gr$요일 <- data.gr$요일 %>% factor(levels = c("월", "화","수", "목", "금", "토", "일"))
+data.gr %>% str()
+data.gr$요일 %>% table()
+
+ggplot(data = data.gr)+geom_bar(aes(x = 요일, y = '', fill = 주야), stat = "identity")+
+  coord_cartesian(ylim=c(1, 15))
+
+#ggplot(data = data.gr)+geom_bar(aes(x = 가해자_당사자종별, y = '', fill = 요일), stat = "identity")+
+#  coord_cartesian(ylim=c(1, 50))
+
+names(data.gr)
+
+# 사고시간 변수 추가
+data.daejeon$hour <- (data.daejeon$발생년월일시 %>% substr(12,13)) %>% as.factor()
+data.daejeon %>% str()
+
+ggplot(data = data.daejeon)+geom_line(aes(x = hour, group = 1), stat = "count")+geom_point(aes(x = hour, group = 1), stat = "count")
+
+ggplot(data = data.daejeon)+
+  geom_bar(aes(x = hour), stat = "count", fill = group.summ$acident_count)+
+  scale_fill_brewer(palette = "Greens")+
+  geom_line(aes(x = hour, group = 1), stat = "count")+
+  geom_point(aes(x = hour, group = 1), stat = "count", colour = "red") # 시간대 별 사고 건수 barplot
+
+data.daejeon.gr.hour <- group_by(data.daejeon, hour) %>% mutate(acident_count = n())
+(data.daejeon$hour)
+
+data.daejeon.gr.hour$acident_count
+group.summ<- group_by(data.daejeon, hour) %>% summarise(acident_count = n())
+?geom_bar()
+group.summ[2] %>% as.vector()
+
+group.summ[2] %>% str()
+
+scale_fill_brewer(palette = "Greens")
