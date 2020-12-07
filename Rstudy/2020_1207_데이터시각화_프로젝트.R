@@ -104,10 +104,23 @@ data.daejeon %>% str()
 
 data.daejeon$hour %>% table() %>% barplot(, main = "시간대별 사고건수", xlab = "시간", ylab = "사고건수", lwd = 3)
 
+
+
 ggplot(data.daejeon, aes(x = hour))+
-  geom_bar(fill = table(data.daejeon$hour) %>% rainbow())+
-  ggtitle("# 시간대별 사고건수")+
+  geom_bar()+
+  scale_fill_gradient(high = "darkblue", low = "white")+
+  ggtitle("시간대별 사고건수")+
   theme(title = element_text(size = 20))
+
+p <- data.daejeon %>% group_by(hour) %>% 
+  summarise(hour_n = n()) %>% 
+  ggplot(aes(hour, hour_n, fill = hour_n))+
+  geom_bar(stat = "identity")
+
+p+scale_fill_gradient(high="red", low = "green")
+
+#fill = table(data.daejeon$hour)
+?scale_fill_gradient2()
 
 ?element
 
