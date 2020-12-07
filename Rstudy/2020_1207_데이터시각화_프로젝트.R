@@ -102,52 +102,64 @@ names(data.gr)
 data.daejeon$hour <- (data.daejeon$발생년월일시 %>% substr(12,13)) %>% as.factor()
 data.daejeon %>% str()
 
-data.daejeon$hour %>% table() %>% barplot(, main = "시간대별 사고건수", xlab = "시간", ylab = "사고건수", lwd = 3)
+# barplot
+data.daejeon$hour %>% table() %>% barplot(main = "시간대별 사고건수", xlab = "시간", ylab = "사고건수", lwd = 3)
 
-
-
-ggplot(data.daejeon, aes(x = hour))+
-  geom_bar()+
-  scale_fill_gradient(high = "darkblue", low = "white")+
-  ggtitle("시간대별 사고건수")+
-  theme(title = element_text(size = 20))
-
-p <- data.daejeon %>% group_by(hour) %>% 
+# 시간대별 사고건수 그래프_fillgradient+labs+line+point
+time_p <- data.daejeon %>% group_by(hour) %>% 
   summarise(hour_n = n()) %>% 
   ggplot(aes(hour, hour_n, fill = hour_n))+
-  geom_bar(stat = "identity")
+  geom_bar(stat = "identity")+
+  ggtitle("시간대별 사고건수")+
+  geom_line(group = 1, size = 1)+
+  geom_point(size = 3, colour = "red")+
+  theme(title = element_text(size = 17))+
+  ylab("사고건수")+
+  xlab("시간")
 
-p+scale_fill_gradient(high="red", low = "green")
+# scale_fill_gradient
+time_p+scale_fill_gradient(high="red", low = "green")
 
-#fill = table(data.daejeon$hour)
-?scale_fill_gradient2()
+# 월(month) 변수 추가
+data.daejeon$month <- (data.daejeon$발생년월일시 %>% substr(6,7)) %>% as.factor()
+data.daejeon %>% head()
+data.daejeon$month %>% str()
 
-?element
+month_p <- data.daejeon %>% group_by(month) %>% 
+  summarise(month_n = n()) %>% 
+  ggplot(aes(month, month_n, fill = month_n))+
+  geom_bar(stat = "identity")+
+  ggtitle("월별 사고건수")+
+  geom_line(group = 1, size = 1)+
+  geom_point(size = 3, colour = "red")+
+  theme(title = element_text(size = 17))+
+  ylab("사고건수")+
+  xlab("월")+
+  ylim(c(0,10))
 
-ggplot(data = data.daejeon)+geom_line(aes(x = hour, group = 1), stat = "count")+geom_point(aes(x = hour, group = 1), stat = "count")
+month_p+scale_fill_gradient(high="tomato2", low = "chartreuse3")
+month_p+scale_fill_gradient(high="red", low = "green")
+# 7월 교통사고 -> 장마철 빗길운전 사고 다수
+# 5월 교통사고 -> 어린이날 등 공휴일로 사고 다수
+# 11월 교통사고 -> 가을 행락객이 가장 많은 달
 
-ggplot(data = data.daejeon)+
-  geom_bar(aes(x = hour), stat = "count", fill = group.summ$acident_count)+
-  scale_fill_brewer(palette = "Greens")+
-  geom_line(aes(x = hour, group = 1), stat = "count")+
-  geom_point(aes(x = hour, group = 1), stat = "count", colour = "red") # 시간대 별 사고 건수 barplot
+data.daejeon %>% head()
 
-data.daejeon.gr.hour <- group_by(data.daejeon, hour) %>% mutate(acident_count = n())
-(data.daejeon$hour)
-
-data.daejeon.gr.hour$acident_count
-group.summ<- group_by(data.daejeon, hour) %>% summarise(acident_count = n())
-?geom_bar()
-group.summ[2] %>% as.vector()
-
-group.summ[2] %>% str()
-
-scale_fill_brewer(palette = "Greens")
-
-
-
+# 가해_피해_mosaic plot
+gp_table <- table(data.daejeon$가해자_당사자종별, data.daejeon$피해자_당사자종별)
 
 
+install.packages("ggmosaic")
+library(ggmosaic)
+
+gp <- ggplot(data = data.daejeon)+
+  geom_mosaic(aes(x = product(가해자_당사자종별, 피해자_당사자종별), fill = 가해자_당사자종별))+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  xlab("피해자")+
+  ylab("가해자")
+
+# interactive mosaic plot
+ggplotly(gp)
 
 
 
